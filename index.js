@@ -7,15 +7,15 @@ const morgan = require("morgan");
 const app = express();
 const port = 8080;
 
-const mountRoutes = require("./routes/index");
-mountRoutes(app);
-
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("tiny"));
 }
+
+const mountRoutes = require("./routes/index");
+mountRoutes(app);
 
 app.get("/", (req, res) => {
   res.send("<h1>Welcome to the panda API</h1>");

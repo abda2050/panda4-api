@@ -5,6 +5,11 @@ const router = new Router();
 module.exports = router;
 
 router.get("/", async (req, res) => {
-  const { rows } = await db.query("SELECT * FROM users ORDER BY id ASC");
-  res.json(rows);
+  try {
+    const { rows } = await db.query("SELECT * FROM users ORDER BY id ASC");
+    res.json(rows);
+  } catch (err) {
+    console.log(err);
+    res.status(400).send("ERROR 400: Bad Request");
+  }
 });
