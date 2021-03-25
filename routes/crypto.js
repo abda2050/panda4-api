@@ -4,7 +4,7 @@
 const crypto = require("crypto");
 
 function sha256(txt) {
-  const secret = "abcdefg";
+  const secret = process.env.SHA_SECRET;
   const hash = crypto.createHmac("sha256", secret).update(txt).digest("hex");
   return hash;
 }

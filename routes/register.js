@@ -16,6 +16,9 @@ router.post("/", async (req, res) => {
     );
     res.send("query made successfully");
   } catch (err) {
+    if (err.code === "23505") {
+      console.log("Duplicate Email");
+    }
     res.send(`error: ${err}`);
   }
 });
