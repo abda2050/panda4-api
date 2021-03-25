@@ -6,7 +6,7 @@ module.exports = router;
 
 router.get("/", async (req, res) => {
   try {
-    const { rows } = await db.query("SELECT * FROM users ORDER BY id ASC");
+    const { rows } = await db.query("SELECT id, name, email, role FROM users ORDER BY id ASC");
     res.json(rows);
   } catch (err) {
     console.log(err);
