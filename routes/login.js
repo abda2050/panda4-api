@@ -5,6 +5,26 @@ const sha256 = require("./crypto");
 
 module.exports = router;
 
+const authPass = async (saltedPass, dbPass, body, res) => {
+  if (saltedPass === dbPass) {
+    const session_id = randomString();
+    await db.query("UPDATE sessions SET sessionid=$1 WHERE email=$2", [
+      session_id,
+      body.email,
+    ]);
+    res
+      .cookie("session_id", session_id, {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+      })
+      .json({ msg: `${body.email} Authenticated and Logged In` });
+    console.log(`${body.email} is authenticated`);
+  } else {
+    res.json({ creds: false });
+  }
+};
+
 router.post("/", async (req, res) => {
   const cookie = req.cookies.session_id;
   if (!cookie) {
@@ -21,24 +41,7 @@ router.post("/", async (req, res) => {
       }
 
       const saltedPass = sha256(body.password + rows[0].salt);
-
-      if (saltedPass === rows[0].password) {
-        const session_id = randomString();
-        await db.query("UPDATE sessions SET sessionid=$1 WHERE email=$2", [
-          session_id,
-          body.email,
-        ]);
-        res
-          .cookie("session_id", session_id, {
-            httpOnly: true,
-            sameSite: "None",
-            secure: true,
-          })
-          .json({ msg: `${body.email} Authenticated and Logged In` });
-        console.log(`${body.email} is authenticated`);
-      } else {
-        res.json({ creds: false });
-      }
+      authPass(saltedPass, rows[0].password, body, res);
     } catch (err) {
       console.log("error in login.js");
       res.send("error");
