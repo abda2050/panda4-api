@@ -29,7 +29,11 @@ router.post("/", async (req, res) => {
           body.email,
         ]);
         res
-          .cookie("session_id", session_id, { httpOnly: true })
+          .cookie("session_id", session_id, {
+            httpOnly: true,
+            sameSite: "None",
+            secure: true,
+          })
           .json({ msg: `${body.email} Authenticated and Logged In` });
         console.log(`${body.email} is authenticated`);
       } else {
