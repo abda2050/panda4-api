@@ -12,43 +12,33 @@ const authPass = async (saltedPass, dbPass, body, res) => {
       session_id,
       body.email,
     ]);
-    res
-      .cookie("session_id", session_id, {
-        httpOnly: true,
-        sameSite: "None",
-        secure: true,
-      })
-      .json({ msg: `${body.email} Authenticated and Logged In` });
+    res.json({ session_id: session_id });
     console.log(`${body.email} is authenticated`);
   } else {
     res.json({ creds: false });
+    console.log("Incorrect password");
   }
 };
 
 router.post("/", async (req, res) => {
-  const cookie = req.cookies.session_id;
-  if (!cookie) {
-    const { body } = req;
-    try {
-      const {
-        rows,
-      } = await db.query("SELECT password, salt FROM users WHERE email=$1", [
-        body.email,
-      ]);
+  const { body } = req;
+  try {
+    const {
+      rows,
+    } = await db.query("SELECT password, salt FROM users WHERE email=$1", [
+      body.email,
+    ]);
 
-      if (rows.length == 0) {
-        res.json({ creds: false });
-      }
-
-      const saltedPass = sha256(body.password + rows[0].salt);
-      authPass(saltedPass, rows[0].password, body, res);
-    } catch (err) {
-      console.log("error in login.js");
-      res.send("error");
+    if (rows.length == 0) {
+      res.json({ creds: false });
+      console.log("Incorrect Email");
     }
-  } else {
-    console.log("already logged in");
-    res.send("already logged in");
+
+    const saltedPass = sha256(body.password + rows[0].salt);
+    authPass(saltedPass, rows[0].password, body, res);
+  } catch (err) {
+    console.log("error in login.js");
+    res.send("error");
   }
 });
 
