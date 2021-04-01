@@ -15,6 +15,6 @@ router.post("/", async (req, res) => {
       res.json({ error: err });
     }
   } else {
-    console.log("failed");
+    res.json({ msg: "failed router/logout.js" });
   }
 });
