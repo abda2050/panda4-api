@@ -11,10 +11,13 @@ router.post("/", async (req, res) => {
     } = await db.query("SELECT email FROM sessions WHERE sessionid=$1", [
       session_id,
     ]);
-    console.log(rows[0].email);
-    res.send("Look at console");
+    if (rows.length == 0) {
+      res.json({ msg: false });
+    } else {
+      res.json({ email: rows[0].email });
+    }
   } catch (err) {
     console.log(err);
-    res.send("Error: look at console");
+    res.json({ msg: "error" });
   }
 });

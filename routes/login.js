@@ -13,10 +13,8 @@ const authPass = async (saltedPass, dbPass, body, res) => {
       body.email,
     ]);
     res.json({ session_id: session_id });
-    console.log(`${body.email} is authenticated`);
   } else {
-    res.json({ creds: false });
-    console.log("Incorrect password");
+    res.json({ creds: false, msg: "Incorrect password" });
   }
 };
 
@@ -30,8 +28,7 @@ router.post("/", async (req, res) => {
     ]);
 
     if (rows.length == 0) {
-      res.json({ creds: false });
-      console.log("Incorrect Email");
+      res.json({ creds: false, msg: "incorrect email" });
     }
 
     const saltedPass = sha256(body.password + rows[0].salt);
